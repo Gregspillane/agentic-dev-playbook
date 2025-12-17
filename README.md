@@ -2,13 +2,36 @@
 
 A structured workflow for building software with AI coding agents. This playbook enables autonomous, session-based development while keeping humans in the loop through clear documentation and step-by-step execution.
 
+---
+
+## Two Workflows
+
+This playbook provides two workflows for different scenarios:
+
+| Workflow | Use Case | Starting Point |
+|----------|----------|----------------|
+| **[Greenfield](#greenfield-workflow)** | New projects from scratch | Empty repository |
+| **[Feature Development](feature-development/)** | Substantial features in existing codebases | Established codebase |
+
+**Choose Greenfield when:** Building a new project, the repository is empty or nearly empty, you're establishing patterns from scratch.
+
+**Choose Feature Development when:** Adding a significant feature to an existing codebase, patterns and conventions already exist, backwards compatibility matters.
+
+---
+
 ## Why This Exists
 
 AI coding agents (Claude Code, Codex, Cursor, etc.) are powerful but have a fundamental limitation: **they have no memory between sessions**. Each new session starts fresh with no context about what was built before, what patterns were established, or what decisions were made.
 
 This playbook solves that problem through structured documentation that serves as the memory bridge between sessions. The AI reads the docs, does the work, updates the docs, and the next session picks up exactly where the last one left off.
 
-## How It Works
+---
+
+## Greenfield Workflow
+
+For new projects built from scratch.
+
+### How It Works
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -38,7 +61,73 @@ This playbook solves that problem through structured documentation that serves a
 └─────────────────────────────────────────────────────────────┘
 ```
 
+### Quick Start (Greenfield)
+
+1. **Create Your Project Brief** — Copy `templates/project-brief.md` and fill it out
+2. **Generate Your Document Set** — Use `templates/generation-prompt.md` to produce overview, phase plan, and impl log
+3. **Set Up Your Repository** — Place docs and start coding
+4. **Build Iteratively** — One story per session, update docs, repeat
+
+### Repository Structure (Greenfield)
+
+```
+your-project/
+├── docs/
+│   ├── overview.md
+│   ├── phase_plan.md
+│   └── impl_log.md
+├── AGENT_PROMPT.md
+├── AGENT_END.md
+└── src/
+```
+
+---
+
+## Feature Development Workflow
+
+For adding substantial features to existing codebases.
+
+**[→ Full Feature Development Guide](feature-development/)**
+
+### Key Differences from Greenfield
+
+| Aspect | Greenfield | Feature Development |
+|--------|------------|---------------------|
+| **Starting Point** | Empty repository | Existing codebase |
+| **Input Document** | Project Brief | Feature Brief |
+| **Conventions** | Established during development | Inherited, extended carefully |
+| **Agent Behavior** | Creates patterns | Discovers and follows patterns |
+| **Primary Risk** | Building too much | Breaking existing functionality |
+
+### Quick Start (Feature Development)
+
+1. **Create Feature Brief** — Copy `feature-development/templates/feature-brief.md`
+2. **Generate Feature Docs** — Use `feature-development/templates/feature-generation-prompt.md`
+3. **Create Feature Branch** — Standard git workflow
+4. **Place Docs** — In `docs/projects/[feature-name]/`
+5. **Build Iteratively** — Same loop, but with backwards compatibility focus
+
+### Repository Structure (Feature Development)
+
+```
+existing-project/
+├── docs/
+│   └── projects/
+│       └── [feature-name]/
+│           ├── feature_overview.md
+│           ├── phase_plan.md
+│           ├── impl_log.md
+│           ├── AGENT_PROMPT.md
+│           └── END_SESSION.md
+├── CLAUDE.md                    # Existing project conventions
+└── src/                         # Existing codebase
+```
+
+---
+
 ## Core Principles
+
+These apply to both workflows:
 
 1. **One story per session** — Each session implements exactly one user story. Small enough to complete without context loss, large enough to avoid overhead.
 
@@ -48,93 +137,93 @@ This playbook solves that problem through structured documentation that serves a
 
 4. **Human in the loop** — Humans review at phase boundaries and can intervene at any story. Autonomous doesn't mean unsupervised.
 
-## Quick Start
-
-### 1. Create Your Project Brief
-
-Copy `templates/project-brief.md` and fill it out for your project. This captures:
-- What you're building and why
-- Who uses it
-- Technical stack and constraints
-- What's in scope vs. out of scope
-- How you want to phase the work
-
-### 2. Generate Your Document Set
-
-Use the generation prompt (`templates/generation-prompt.md`) to produce:
-- `docs/overview.md` — Product truth, flows, data models
-- `docs/phase_plan.md` — All phases and user stories
-- `docs/impl_log.md` — Session memory template
-
-### 3. Set Up Your Repository
-
-```
-your-project/
-├── docs/
-│   ├── overview.md
-│   ├── phase_plan.md
-│   └── impl_log.md
-├── AGENT_PROMPT.md      # Copy from templates/
-├── AGENT_END.md         # Copy from templates/
-└── src/
-```
-
-### 4. Start Building
-
-Each coding session:
-1. Point the agent at `AGENT_PROMPT.md`
-2. Agent reads docs, finds next `[TODO]` story
-3. Agent implements, tests, updates docs
-4. End session with `AGENT_END.md` checklist
+---
 
 ## Repository Contents
 
 ```
 agentic-dev-playbook/
-├── README.md                          # You are here
+├── README.md                              # You are here
 ├── docs/
-│   └── workflow.md                    # Detailed workflow documentation
-├── templates/
-│   ├── project-brief.md               # Template for defining your project
-│   ├── generation-prompt.md           # Prompt to generate doc set
-│   ├── AGENT_PROMPT.md                # Session start instructions
-│   └── AGENT_END.md                   # Session end checklist
-└── examples/
-    ├── example-brief.md               # Sample completed brief
-    └── generated/                     # Sample generated documents
+│   └── workflow.md                        # Detailed greenfield workflow
+│
+├── templates/                             # Greenfield templates
+│   ├── project-brief.md
+│   ├── generation-prompt.md
+│   ├── AGENT_PROMPT.md
+│   └── AGENT_END.md
+│
+├── feature-development/                   # Feature development workflow
+│   ├── README.md                          # Feature workflow guide
+│   └── templates/
+│       ├── feature-brief.md               # Define your feature
+│       ├── feature-generation-prompt.md   # Generate feature docs
+│       ├── FEATURE_AGENT_PROMPT.md        # Session start (features)
+│       └── FEATURE_END_SESSION.md         # Session end (features)
+│
+└── examples/                              # Greenfield example
+    ├── example-brief.md
+    └── generated/
         ├── overview.md
         ├── phase_plan.md
         └── impl_log.md
 ```
 
-## When to Use This
+---
+
+## When to Use Which
+
+### Greenfield Workflow
 
 **Good fit:**
-- Greenfield projects with clear scope
+- New projects with clear scope
 - Projects that will take multiple sessions/days
 - Teams sharing AI coding work across members
-- Projects where consistency matters
+- Projects where you're establishing patterns
 
 **Less ideal:**
 - Quick prototypes or spikes
-- Highly exploratory work where scope is undefined
+- Highly exploratory work
 - Single-session tasks
+- Adding to existing codebases
+
+### Feature Development Workflow
+
+**Good fit:**
+- Substantial features in existing codebases
+- Features spanning multiple sessions
+- Work requiring backwards compatibility
+- Features touching multiple parts of the system
+
+**Less ideal:**
+- Small bug fixes or tweaks
+- Exploratory spikes
+- Greenfield projects
+- Single-file changes
+
+---
 
 ## Key Documents Explained
 
 | Document | Purpose | Updates |
 |----------|---------|---------|
-| **Project Brief** | Input — defines what you're building | Once at start |
-| **Overview** | Source of truth for product behavior | Rarely |
+| **Project/Feature Brief** | Input — defines what you're building | Once at start |
+| **Overview** | Source of truth for behavior | Rarely |
 | **Phase Plan** | Work queue with all stories | Per story (status only) |
-| **Impl Log** | Session memory — conventions, state, history | Every session |
-| **Agent Prompt** | Operating instructions for the AI | Per project (if customization needed) |
+| **Impl Log** | Session memory — state, history | Every session |
+| **Agent Prompt** | Operating instructions | Per project/feature |
+
+---
 
 ## Documentation
 
-- [Detailed Workflow Guide](docs/workflow.md) — Deep dive into how everything works
-- [Project Brief Template](templates/project-brief.md) — Starting point for new projects
-- [Example Project](examples/) — See the workflow in action
+- [Detailed Greenfield Workflow](docs/workflow.md) — Deep dive into greenfield development
+- [Feature Development Guide](feature-development/) — Complete feature workflow
+- [Greenfield Templates](templates/) — Starting points for new projects
+- [Feature Templates](feature-development/templates/) — Starting points for features
+- [Example Project](examples/) — See greenfield workflow in action
+
+---
 
 ## Contributing
 
